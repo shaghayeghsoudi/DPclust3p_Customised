@@ -1,9 +1,12 @@
+
 ALLELECOUNTER = "alleleCounter"
 LINKAGEPULL = "Linkage_pull.pl"
 
 ############################################
 # VCF 2 LOCI
 ############################################
+
+
 #' Parse genome index
 #' 
 #' Convenience function that parses a reference genome index as generated
@@ -12,11 +15,11 @@ LINKAGEPULL = "Linkage_pull.pl"
 #' @return A data frame with columns "chromosome", "length", "offset", "fasta_line_length", "line_blen"
 #' @author sd11
 #' @export
-parseFai = function(fai_file) {
-  fai = read.table(fai_file, header=F, stringsAsFactors=F)
-  colnames(fai) = c("chromosome", "length", "offset", "fasta_line_length", "line_blen")
-  return(fai)
-}
+#parseFai = function(fai_file) {
+#  fai = read.table(fai_file, header=F, stringsAsFactors=F)
+#  colnames(fai) = c("chromosome", "length", "offset", "fasta_line_length", "line_blen")
+#  return(fai)
+#}
 
 #' Parse chromosomes to ignore file
 #' 
@@ -26,11 +29,11 @@ parseFai = function(fai_file) {
 #' @return A data frame with a single column named "chromosome"
 #' @author sd11
 #' @export
-parseIgnore = function(ignore_file) {
-  ign = read.table(ignore_file, header=F, stringsAsFactors=F)
-  colnames(ign) = c("chromosome")
-  return(ign)
-}
+#parseIgnore = function(ignore_file) {
+#  ign = read.table(ignore_file, header=F, stringsAsFactors=F)
+#  colnames(ign) = c("chromosome")
+#  return(ign)
+#}
 
 #' Transform vcf to loci file
 #' 
@@ -43,26 +46,25 @@ parseIgnore = function(ignore_file) {
 #' @param dummy_ref_allele The reference allele to store, supply when you want to override what is in the VCF (Default: NA)
 #' @author sd11
 #' @export
-vcf2loci = function(vcf_files, fai_file, ign_file, outfile, dummy_alt_allele=NA, dummy_ref_allele=NA) {
-  fai = parseFai(fai_file)
-  ign = parseIgnore(ign_file)
-  allowed_chroms = which(!(fai$chromosome %in% ign$chromosome))
+maf2loci = function(maf_file, outfile, dummy_alt_allele=NA, dummy_ref_allele=NA,refence_genome=genome_biuld) {
+  #fai = parseFai(fai_file)
+  #ign = parseIgnore(ign_file)
+  #allowed_chroms = which(!(fai$chromosome %in% ign$chromosome))
   
   # Run through each supplied vcf file, collect the loci from each
   combined.loci = data.frame()
-  for (vcf_file in vcf_files) {
-    read_data = tryCatch(read.delim(vcf_file, comment.char="#", header=F, stringsAsFactor=F, nrows=1),
-                         error = function(e) NULL)
+  for (maf_file in maf_file) {
+
     
+    read_data_maf<-read.delim(file = maf_file, skip = 1, sep = "\t")
+    read_data_maf<-read_data_maf[read_data_maf$Variant_Type == "SNP",]
+
     # check that there was data in the file
-    if (!is.null(read_data)) {
-      vcf.cols = ncol(read_data)
-      vcf.cols.default = 10 # vcf file standard contains 10 columns
-      vcf.colClasses = c(NA, NA, "NULL", NA, NA, rep("NULL", 5+(vcf.cols-vcf.cols.default)))
-      vcf.loci = read.delim(vcf_file, comment.char="#", header=F, stringsAsFactor=F, colClasses=vcf.colClasses)
-      colnames(vcf.loci) = c("chromosome", "pos", "ref","alt")
-      vcf.loci.sel = subset(vcf.loci, chromosome %in% fai$chromosome[allowed_chroms])
-      combined.loci = rbind(combined.loci, vcf.loci.sel)
+    if (!is.null(read_data_maf)) {
+      combined.loci<-read_data_maf[,c("Chromosome","Start_Position","Reference_Allele","Tumor_Seq_Allele2")]
+      colnames(combined.loci) = c("chromosome", "pos", "ref","alt")
+      #vcf.loci.sel = subset(vcf.loci, chromosome %in% fai$chromosome[allowed_chroms])
+      #combined.loci = rbind(combined.loci, vcf.loci.sel)
     }
   }
   
@@ -84,8 +86,16 @@ vcf2loci = function(vcf_files, fai_file, ign_file, outfile, dummy_alt_allele=NA,
   chrpos = paste0(combined.loci$chromosome, "_", combined.loci$pos)
   chrpos_dup = chrpos[duplicated(chrpos)]
   combined.loci = combined.loci[!chrpos %in% chrpos_dup,]
-  write.table(combined.loci, col.names=F, quote=F, row.names=F, file=outfile, sep="\t")
+
+                     ### adjusted by Shaghayegh
+   combined.loci[,1]<-gsub("chr","",combined.loci[,1])  
+   write.table(combined.loci, col.names=F, quote=F, row.names=F, file=outfile, sep="\t")
+
+
+
 }
+
+
 
 ############################################
 # Mutation signatures
@@ -418,6 +428,7 @@ GetDirichletProcessInfo<-function(outputfile, cellularity, info, subclone.file, 
       df = data.frame(matrix(ncol=16, nrow=0))
       colnames(df) = c("chr", "start", "end", "WT.count", "mut.count", "subclonal.CN", "nMaj1","nMin1", "frac1", "nMaj2", "nMin2", "frac2", "phase", "mutation.copy.number", "subclonal.fraction", "no.chrs.bearing.mut")
     }
+    df[,1]<-gsub("chr","",df[,1]) 
     write.table(df, outputfile, sep="\t", row.names=F, quote=F)
   }
   
@@ -428,6 +439,8 @@ GetDirichletProcessInfo<-function(outputfile, cellularity, info, subclone.file, 
   }
   
   subclone.data = read.table(subclone.file,sep="\t",header=T,stringsAsFactors=F)
+  subclone.data$chr<- gsub("chr","",subclone.data$chr)
+
   # Add in the Y chrom if donor is male and Battenberg hasn't supplied it (BB returns X/Y ad multiple copies of X for men)
   if (is.male & (! "Y" %in% subclone.data$chr) & adjust_male_y_chrom) {
     subclone.data = addYchromToBattenberg(subclone.data)
@@ -772,5 +785,3 @@ createProjectFile = function(outputfile, donornames, samplenames, sex, purities=
                       indeldatafiles=ifelse(!is.null(indeldatafiles), indeldatafiles, NA), stringsAsFactors=F)
   write.table(output, file=outputfile, quote=F, row.names=F, sep="\t")
 }
-
-
