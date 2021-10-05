@@ -1,3 +1,4 @@
+###  Wrapper script modified by Shaghayegh Soudi ###
 #'
 #' Simple DPClust preprocessing pipeline that takes a VCF file with SNV calls. It fetches
 #' allele counts from the specified VCF file. With the counts and the copy number fit it
@@ -13,26 +14,29 @@ library(optparse)
 
 option_list = list(
   make_option(c("-s", "--samplename"), type="character", default=NULL, help="Samplename of the sample to run", metavar="character"),
-  make_option(c("-v", "--vcf"), type="character", default=NULL, help="VCF file with mutation data", metavar="character"),
+  make_option(c("-m", "--maf"), type="character", default=NULL, help="maf file with mutation data", metavar="character"),
   make_option(c("-r", "--rho_and_psi"), type="character", default=NULL, help="Battenberg rho and psi output file", metavar="character"),
   make_option(c("-c", "--copynumber"), type="character", default=NULL, help="Battenberg subclones output file with copy number data", metavar="character"),
   make_option(c("--sex"), type="character", default=NULL, help="Sex of the sample", metavar="character"),
-  make_option(c("-o", "--output"), type="character", default=NULL, help="Output directory", metavar="character"),
-  make_option(c("--fai"), type="character", default=NULL, help="Reference genome index", metavar="character"),
-  make_option(c("--ign"), type="character", default=NULL, help="File with a list of contigs to ignore", metavar="character")
+  make_option(c("-o", "--output"), type="character", default=NULL, help="Output directory", metavar="character")
+  #make_option(c("--fai"), type="character", default=NULL, help="Reference genome index", metavar="character"),
+  #make_option(c("--ign"), type="character", default=NULL, help="File with a list of contigs to ignore", metavar="character"),
+  #make_option(c("--gb"), type="character", default=NULL, help="genome biuld", metavar="character")
 )
+
 
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
 
 samplename = opt$samplename
-vcf_file = opt$vcf
+maf_file = opt$maf
 rho_and_psi_file = opt$rho_and_psi
 subclones_file = opt$copynumber
 sex = opt$sex
 output_dir = opt$output
-fai_file = opt$fai
-ign_file = opt$ign
+#fai_file = opt$fai
+#ign_file = opt$ign
+#genome_biuld = opt$gb
 
 .checkfile = function(infile) {
   if (!file.exists(infile)) {
@@ -40,11 +44,11 @@ ign_file = opt$ign
   }
 }
 
-.checkfile(vcf_file)
+.checkfile(maf_file)
 .checkfile(rho_and_psi_file)
 .checkfile(subclones_file)
-.checkfile(fai_file)
-.checkfile(ign_file)
+#.checkfile(fai_file)
+#.checkfile(ign_file)
 
 if (!sex %in% c("male", "female")) {
   stop("Provide male or female as sex")
@@ -57,11 +61,12 @@ dpoutput_file = file.path(output_dir, paste(samplename, "_allDirichletProcessInf
 loci_file = file.path(output_dir, paste(samplename, "_loci.txt", sep=""))
 allelecounts_file = file.path(output_dir, paste(samplename, "_alleleFrequencies.txt", sep=""))
 
+
 # Dump loci - this function can take multiple vcf files when multiple samples from same donor
-vcf2loci(vcf_file=vcf_file, fai_file=fai_file, ign_file=ign_file, outfile=loci_file)
+maf2loci(maf_file=maf_file,  outfile=loci_file)
 
 # Fetch allele counts
-dumpCounts.Sanger(vcf_infile=vcf_file, tumour_outfile=allelecounts_file)
+dumpCounts.maf(maf_file=maf_file, tumour_outfile=allelecounts_file)
 
 # Create dpIn file
 runGetDirichletProcessInfo(loci_file=loci_file, 
@@ -74,5 +79,5 @@ runGetDirichletProcessInfo(loci_file=loci_file,
                            output_file=dpoutput_file)
 
 # Cleanup
-file.remove(loci_file)
-file.remove(allelecounts_file)
+#file.remove(loci_file)
+#file.remove(allelecounts_file)
