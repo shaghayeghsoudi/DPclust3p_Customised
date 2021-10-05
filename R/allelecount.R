@@ -2,7 +2,7 @@
 # Allele counting functions - SNV, indel and SV
 ################################################
 #' Run alleleCount
-### modified by Shaghayegh Soudi
+### modified by Shaghayegh Soudi to work on MAF file #####
 #' Dump allele counts from maf file
 #'
 #' Dump allele counts stored in the sample columns of the maf file. Output will go into a file
