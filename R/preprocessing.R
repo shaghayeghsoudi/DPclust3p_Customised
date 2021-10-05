@@ -4,6 +4,7 @@ LINKAGEPULL = "Linkage_pull.pl"
 
 ############################################
 # VCF 2 LOCI
+## MAF to LOCI (the script has been modified by Shaghayegh Soudi to work on MAF file)
 ############################################
 
 
