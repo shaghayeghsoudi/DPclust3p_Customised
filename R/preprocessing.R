@@ -47,55 +47,78 @@ LINKAGEPULL = "Linkage_pull.pl"
 #' @param dummy_ref_allele The reference allele to store, supply when you want to override what is in the VCF (Default: NA)
 #' @author sd11
 #' @export
-maf2loci = function(maf_file, outfile, dummy_alt_allele=NA, dummy_ref_allele=NA,refence_genome=genome_biuld) {
-  #fai = parseFai(fai_file)
-  #ign = parseIgnore(ign_file)
-  #allowed_chroms = which(!(fai$chromosome %in% ign$chromosome))
+maf2loci = function(maf_file, outfile, dummy_alt_allele=NA, dummy_ref_allele=NA) {
   
-  # Run through each supplied vcf file, collect the loci from each
-  combined.loci = data.frame()
-  for (maf_file in maf_file) {
+    # Run through each supplied vcf file, collect the loci from each
+    combined.loci = data.frame()
+    for (maf_file in maf_file) {
 
-    
-    read_data_maf<-read.delim(file = maf_file, skip = 1, sep = "\t")
-    read_data_maf<-read_data_maf[read_data_maf$Variant_Type == "SNP",]
+     dummy_ref_allele = "A"
+     dummy_alt_allele = "C"
+ 
+     read_data_maf<-read.delim(file = maf_file, skip = 1, sep = "\t")
+     read_data_maf_snv<-read_data_maf[read_data_maf$Variant_Type == "SNP",]
 
-    # check that there was data in the file
-    if (!is.null(read_data_maf)) {
-      combined.loci<-read_data_maf[,c("Chromosome","Start_Position","Reference_Allele","Tumor_Seq_Allele2")]
-      colnames(combined.loci) = c("chromosome", "pos", "ref","alt")
-      #vcf.loci.sel = subset(vcf.loci, chromosome %in% fai$chromosome[allowed_chroms])
-      #combined.loci = rbind(combined.loci, vcf.loci.sel)
-    }
-  }
+      # check that there was data in the file
+      if (!is.null(read_data_maf_snv)) {
+      combined.loci.snv<-read_data_maf_snv[,c("Chromosome","Start_Position","Reference_Allele","Tumor_Seq_Allele2")]
+      colnames(combined.loci.snv) = c("chromosome", "pos", "ref","alt")
+      } ## if statement 
+
   
-  if (nrow(combined.loci) > 0) {
-    # Override the ref and alt alleles if desired
-    if (!is.na(dummy_alt_allele) & dummy_alt_allele!="NA") {
-      combined.loci$alt = dummy_alt_allele
-    }
-    if (!is.na(dummy_ref_allele) & dummy_ref_allele!="NA") {
-      combined.loci$ref = dummy_ref_allele
-    }
-  } else {
-    # no data found, generate an empty data.frame
-    combined.loci = data.frame(matrix(ncol = 4, nrow = 0))
-    colnames(combined.loci) = c("chromosome", "pos", "ref","alt")
-  }
+       if (nrow(combined.loci.snv) == 0) {
+       # no data found, generate an empty data.frame
+       combined.loci.snv = data.frame(matrix(ncol = 4, nrow = 0))
+       colnames(combined.loci.snv) = c("chromosome", "pos", "ref","alt")
+         }
   
-  # Remove duplicate entries
-  chrpos = paste0(combined.loci$chromosome, "_", combined.loci$pos)
-  chrpos_dup = chrpos[duplicated(chrpos)]
-  combined.loci = combined.loci[!chrpos %in% chrpos_dup,]
+      # Remove duplicate entries
+      chrpos = paste0(combined.loci.snv$chromosome, "_", combined.loci.snv$pos)
+      chrpos_dup = chrpos[duplicated(chrpos)]
+      combined.loci.snv = combined.loci.snv[!chrpos %in% chrpos_dup,]
 
-                     ### adjusted by Shaghayegh
-   combined.loci[,1]<-gsub("chr","",combined.loci[,1])  
+      ### adjusted by Shaghayegh
+      combined.loci.snv[,1]<-gsub("chr","",combined.loci.snv[,1])  
+
+
+
+      ######## for indels ########
+
+      read_data_maf_else<-read_data_maf[read_data_maf$Variant_Type != "SNP",]
+
+        # check that there was data in the file
+        if (!is.null(read_data_maf_else)) {
+        combined.loci.else<-read_data_maf_else[,c("Chromosome","Start_Position","Reference_Allele","Tumor_Seq_Allele2")]
+        colnames(combined.loci.else) = c("chromosome", "pos", "ref","alt")
+
+        combined.loci.else$ref<-rep(dummy_ref_allele,nrow(combined.loci.else))
+        combined.loci.else$alt<-rep(dummy_alt_allele,nrow(combined.loci.else))
+         }
+  
+  
+       if (nrow(combined.loci.else) == 0) {
+       # no data found, generate an empty data.frame
+       combined.loci.else = data.frame(matrix(ncol = 4, nrow = 0))
+       colnames(combined.loci.else) = c("chromosome", "pos", "ref","alt")
+       }
+  
+    # Remove duplicate entries
+    chrpos.else = paste0(combined.loci.else$chromosome, "_", combined.loci.else$pos)
+    chrpos_dup.else = chrpos.else[duplicated(chrpos.else)]
+    combined.loci.else = combined.loci.else[!chrpos.else %in% chrpos_dup.else,]
+
+  ### adjusted by Shaghayegh
+   combined.loci.else[,1]<-gsub("chr","",combined.loci.else[,1])  
+
+
+   }
+    ### merge both tables
+
+   combined.loci<-rbind(combined.loci.snv,combined.loci.else)
+   combined.loci<-combined.loci[order(combined.loci[,1], combined.loci[,2]), ]
    write.table(combined.loci, col.names=F, quote=F, row.names=F, file=outfile, sep="\t")
 
-
-
 }
-
 
 
 ############################################

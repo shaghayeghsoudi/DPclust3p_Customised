@@ -23,48 +23,96 @@ dumpCounts.maf = function(maf_file, tumour_outfile,  normal_outfile=NA, samplena
    
    for (maf_file in maf_file) { 
    maf = read.delim(maf_file, skip = 1, header = TRUE, sep = "\t")
-   maf_SNV<-maf[maf$Variant_Type == "SNP",]
-   counts_maf = maf_SNV[,c("t_ref_count","t_alt_count")]
-   rownames(counts_maf)<-paste(maf_SNV$Chromosome,maf_SNV$Start_Position, sep = ":")
-   allele.ref = as.character(maf_SNV[,"Reference_Allele"])
-   allele.alt = as.character(maf_SNV[,"Tumor_Seq_Allele2"])
+   dummy_ref_allele = "A"
+   dummy_alt_allele = "C"
 
-
-   count.ref = counts_maf[,1]
-   count.alt = counts_maf[,2]
-   #allele.ref = as.character(VariantAnnotation::ref(v))
-   #allele.alt = unlist(lapply(VariantAnnotation::alt(v), function(x) { as.character(x[[1]]) }))
+   ### SNVs ###
+   maf_snv<-maf[maf$Variant_Type == "SNP",]
+   counts_maf_snv = maf_snv[,c("t_ref_count","t_alt_count")]
+   rownames(counts_maf_snv)<-paste(maf_snv$Chromosome,maf_snv$Start_Position, sep = ":")
+   allele.ref.snv = as.character(maf_snv[,"Reference_Allele"])
+   allele.alt.snv = as.character(maf_snv[,"Tumor_Seq_Allele2"])
+   count.ref.snv = counts_maf_snv[,1]
+   count.alt.snv = counts_maf_snv[,2]
    
-   output = array(0, c(length(allele.ref), 4))
-   nucleotides = c("A", "C", "G", "T")
-   # Propagate the alt allele counts
-   nucleo.index = match(allele.alt, nucleotides)
-  
-   for (i in 1:nrow(output)) {
-    output[i,nucleo.index[i]] = count.alt[i]
-   } ## for i loop
-  
-  # Propagate the reference allele counts
-  nucleo.index = match(allele.ref, nucleotides)
-  for (i in 1:nrow(output)) {
-    output[i,nucleo.index[i]] = count.ref[i]
-  }  ## second for i loop
 
-  if (nrow(maf_SNV)==0) {
+   ### else: insetions, delitions, DNPs, TBPs 
+   maf_else<-maf[maf$Variant_Type != "SNP",]
+   counts_maf_else = maf_else[,c("t_ref_count","t_alt_count")]
+   rownames(counts_maf_else)<-paste(maf_else$Chromosome,maf_else$Start_Position, sep = ":")
+   count.ref.else = counts_maf_else[,1]
+   count.alt.else = counts_maf_else[,2]
+   allele.ref.else=rep(dummy_ref_allele, length(count.ref.else))
+   allele.alt.else=rep(dummy_alt_allele, length(count.alt.else)) 
+   
+  
+
+     ## output table for SNVs
+     output.snv = array(0, c(length(allele.ref.snv), 4))
+     nucleotides = c("A", "C", "G", "T")
+     # Propagate the alt allele counts
+     nucleo.index.snv = match(allele.alt.snv, nucleotides)
+  
+     for (i in 1:nrow(output.snv)) {
+     output.snv[i,nucleo.index.snv[i]] = count.alt.snv[i]
+     } ## for i loop
+  
+     # Propagate the reference allele counts
+     nucleo.index.snv = match(allele.ref.snv, nucleotides)
+     
+     for (i in 1:nrow(output.snv)) {
+     output.snv[i,nucleo.index.snv[i]] = count.ref.snv[i]
+
+    }  ## second for i loop
+
+  if (nrow(maf_snv)==0) {
     output = data.frame(matrix(ncol = 7, nrow = 0))
    } else {
 
-    output<-cbind(as.character(maf_SNV$Chromosome),maf_SNV$Start_Position,output, rowSums(output))
-    colnames(output) = c("#CHR","POS","Count_A","Count_C","Count_G","Count_T","Good_depth")
-    output[,1]<-gsub("chr","",output[,1])  
-    output<-data.frame(output)
-   write.table(output, col.names=T, quote=F, row.names=F, file=tumour_outfile, sep="\t")
+    output.snv<-cbind.data.frame(maf_snv$Chromosome,maf_snv$Start_Position,output.snv, rowSums(output.snv))
+    output.snv[,1]<-gsub("chr","",output.snv[,1]) 
 
-   }                      ### adjusted by Shaghayegh
-   
+    colnames(output.snv) <- c("#CHR","POS","Count_A","Count_C","Count_G","Count_T","Good_depth")
+
+   }  # else                    
+
+
+
+## output table for else (insertions, delitions, DNPs, TNPs)
+     output.else = array(0, c(length(allele.ref.else), 4))
+     nucleotides = c("A", "C", "G", "T")
+     # Propagate the alt allele counts
+     nucleo.index.else = match(allele.alt.else, nucleotides)
+  
+     for (i in 1:nrow(output.else)) {
+     output.else[i,nucleo.index.else[i]] = count.alt.else[i]
+     } ## for i loop
+  
+     # Propagate the reference allele counts
+     nucleo.index.else = match(allele.ref.else, nucleotides)
+     
+     for (i in 1:nrow(output.else)) {
+     output.else[i,nucleo.index.else[i]] = count.ref.else[i]
+
+    }  ## second for i loop
+
+    if (nrow(maf_else)==0) {
+    output.else = data.frame(matrix(ncol = 7, nrow = 0))
+    } else {
+
+    output.else<-cbind.data.frame(maf_else$Chromosome,maf_else$Start_Position,output.else, rowSums(output.else))
+    output.else[,1]<-gsub("chr","",output.else[,1]) 
+
+    colnames(output.else) <- c("#CHR","POS","Count_A","Count_C","Count_G","Count_T","Good_depth")
+
+    }  # else                    
+
+    output_snv_else<-rbind(output.snv,output.else)
+    output<-output_snv_else[order(output_snv_else[,1], output_snv_else[,2]), ]
+    write.table(output, col.names=T, quote=F, row.names=F, file=tumour_outfile, sep="\t")   ### adjusted by Shaghayegh
    }
-
 }
+
 
 ###############################################
 ###############################################
