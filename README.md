@@ -4,6 +4,7 @@
 This R package contains various functions to produce input data for [DPClust](https://github.com/Wedge-Oxford/dpclust) using SNV variant calls and copy number data from [Battenberg](https://github.com/Wedge-Oxford/battenberg). Most importantly, it contains the `runGetDirichletProcessInfo` function that produces the input data for SNV based clustering.
 
 ## IMPORTANT NOTE: the scripts have been changed for maf files ##
+The preprocessing package takes both SNvs and indels from maf file and process them together.
 
 ## Installation instructions
 dpclust3p is an R package and can be installed with the commands right below. It also requires the [alleleCounter](https://github.com/cancerit/allelecount) tool to be in `$PATH`.
