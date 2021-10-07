@@ -19,9 +19,6 @@ option_list = list(
   make_option(c("-c", "--copynumber"), type="character", default=NULL, help="Battenberg subclones output file with copy number data", metavar="character"),
   make_option(c("--sex"), type="character", default=NULL, help="Sex of the sample", metavar="character"),
   make_option(c("-o", "--output"), type="character", default=NULL, help="Output directory", metavar="character")
-  #make_option(c("--fai"), type="character", default=NULL, help="Reference genome index", metavar="character"),
-  #make_option(c("--ign"), type="character", default=NULL, help="File with a list of contigs to ignore", metavar="character"),
-  #make_option(c("--gb"), type="character", default=NULL, help="genome biuld", metavar="character")
 )
 
 
