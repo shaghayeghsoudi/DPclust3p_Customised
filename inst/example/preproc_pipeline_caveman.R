@@ -8,6 +8,8 @@
 #'  * The alleleCounter C utility must be in $PATH
 #' 
 #' v1.1 - 2018-11-01 - sd11 [at] sanger.ac.uk
+# changed by shaghayegh soudi to take maf files with SNVs and indels 
+# shaghayegh.soudi@gmail.com
 
 library(dpclust3p)
 library(optparse)
