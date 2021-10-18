@@ -1,4 +1,3 @@
-
 ALLELECOUNTER = "alleleCounter"
 LINKAGEPULL = "Linkage_pull.pl"
 
@@ -8,33 +7,6 @@ LINKAGEPULL = "Linkage_pull.pl"
 ############################################
 
 
-#' Parse genome index
-#' 
-#' Convenience function that parses a reference genome index as generated
-#' by samtools index
-#' @param fai_file The index
-#' @return A data frame with columns "chromosome", "length", "offset", "fasta_line_length", "line_blen"
-#' @author sd11
-#' @export
-#parseFai = function(fai_file) {
-#  fai = read.table(fai_file, header=F, stringsAsFactors=F)
-#  colnames(fai) = c("chromosome", "length", "offset", "fasta_line_length", "line_blen")
-#  return(fai)
-#}
-
-#' Parse chromosomes to ignore file
-#' 
-#' Convenience function that parses an ignore file. This file
-#' is expected to have a single column with just chromosome names
-#' @param ignore_file The file specifying to be ignored chromosomes
-#' @return A data frame with a single column named "chromosome"
-#' @author sd11
-#' @export
-#parseIgnore = function(ignore_file) {
-#  ign = read.table(ignore_file, header=F, stringsAsFactors=F)
-#  colnames(ign) = c("chromosome")
-#  return(ign)
-#}
 
 #' Transform vcf to loci file
 #' 
@@ -49,155 +21,78 @@ LINKAGEPULL = "Linkage_pull.pl"
 #' @export
 maf2loci = function(maf_file, outfile, dummy_alt_allele=NA, dummy_ref_allele=NA) {
   
-    # Run through each supplied vcf file, collect the loci from each
-    combined.loci = data.frame()
-    for (maf_file in maf_file) {
-
-     dummy_ref_allele = "A"
-     dummy_alt_allele = "C"
- 
-     read_data_maf<-read.delim(file = maf_file, skip = 1, sep = "\t")
-     read_data_maf_snv<-read_data_maf[read_data_maf$Variant_Type == "SNP",]
-
-      # check that there was data in the file
-      if (!is.null(read_data_maf_snv)) {
+  # Run through each supplied vcf file, collect the loci from each
+  combined.loci = data.frame()
+  for (maf_file in maf_file) {
+    
+    dummy_ref_allele = "A"
+    dummy_alt_allele = "C"
+    
+    read_data_maf<-read.delim(file = maf_file, skip = 1, sep = "\t")
+    read_data_maf_snv<-read_data_maf[read_data_maf$Variant_Type == "SNP",]
+    
+    # check that there was data in the file
+    if (!is.null(read_data_maf_snv)) {
       combined.loci.snv<-read_data_maf_snv[,c("Chromosome","Start_Position","Reference_Allele","Tumor_Seq_Allele2")]
       colnames(combined.loci.snv) = c("chromosome", "pos", "ref","alt")
-      } ## if statement 
-
-  
-       if (nrow(combined.loci.snv) == 0) {
-       # no data found, generate an empty data.frame
-       combined.loci.snv = data.frame(matrix(ncol = 4, nrow = 0))
-       colnames(combined.loci.snv) = c("chromosome", "pos", "ref","alt")
-         }
-  
-      # Remove duplicate entries
-      chrpos = paste0(combined.loci.snv$chromosome, "_", combined.loci.snv$pos)
-      chrpos_dup = chrpos[duplicated(chrpos)]
-      combined.loci.snv = combined.loci.snv[!chrpos %in% chrpos_dup,]
-
-      ### adjusted by Shaghayegh
-      combined.loci.snv[,1]<-gsub("chr","",combined.loci.snv[,1])  
-
-
-
-      ######## for indels ########
-
-      read_data_maf_else<-read_data_maf[read_data_maf$Variant_Type != "SNP",]
-
-        # check that there was data in the file
-        if (!is.null(read_data_maf_else)) {
-        combined.loci.else<-read_data_maf_else[,c("Chromosome","Start_Position","Reference_Allele","Tumor_Seq_Allele2")]
-        colnames(combined.loci.else) = c("chromosome", "pos", "ref","alt")
-
-        combined.loci.else$ref<-rep(dummy_ref_allele,nrow(combined.loci.else))
-        combined.loci.else$alt<-rep(dummy_alt_allele,nrow(combined.loci.else))
-         }
-  
-  
-       if (nrow(combined.loci.else) == 0) {
-       # no data found, generate an empty data.frame
-       combined.loci.else = data.frame(matrix(ncol = 4, nrow = 0))
-       colnames(combined.loci.else) = c("chromosome", "pos", "ref","alt")
-       }
-  
+    } ## if statement 
+    
+    
+    if (nrow(combined.loci.snv) == 0) {
+      # no data found, generate an empty data.frame
+      combined.loci.snv = data.frame(matrix(ncol = 4, nrow = 0))
+      colnames(combined.loci.snv) = c("chromosome", "pos", "ref","alt")
+    }
+    
+    # Remove duplicate entries
+    chrpos = paste0(combined.loci.snv$chromosome, "_", combined.loci.snv$pos)
+    chrpos_dup = chrpos[duplicated(chrpos)]
+    combined.loci.snv = combined.loci.snv[!chrpos %in% chrpos_dup,]
+    
+    ### adjusted by Shaghayegh
+    combined.loci.snv[,1]<-gsub("chr","",combined.loci.snv[,1])  
+    
+    
+    
+    ######## for indels ########
+    
+    read_data_maf_else<-read_data_maf[read_data_maf$Variant_Type != "SNP",]
+    
+    # check that there was data in the file
+    if (!is.null(read_data_maf_else)) {
+      combined.loci.else<-read_data_maf_else[,c("Chromosome","Start_Position","Reference_Allele","Tumor_Seq_Allele2")]
+      colnames(combined.loci.else) = c("chromosome", "pos", "ref","alt")
+      
+      combined.loci.else$ref<-rep(dummy_ref_allele,nrow(combined.loci.else))
+      combined.loci.else$alt<-rep(dummy_alt_allele,nrow(combined.loci.else))
+    }
+    
+    
+    if (nrow(combined.loci.else) == 0) {
+      # no data found, generate an empty data.frame
+      combined.loci.else = data.frame(matrix(ncol = 4, nrow = 0))
+      colnames(combined.loci.else) = c("chromosome", "pos", "ref","alt")
+    }
+    
     # Remove duplicate entries
     chrpos.else = paste0(combined.loci.else$chromosome, "_", combined.loci.else$pos)
     chrpos_dup.else = chrpos.else[duplicated(chrpos.else)]
     combined.loci.else = combined.loci.else[!chrpos.else %in% chrpos_dup.else,]
-
-  ### adjusted by Shaghayegh
-   combined.loci.else[,1]<-gsub("chr","",combined.loci.else[,1])  
-
-
-   }
-    ### merge both tables
-
-   combined.loci<-rbind(combined.loci.snv,combined.loci.else)
-   combined.loci<-combined.loci[order(combined.loci[,1], combined.loci[,2]), ]
-   write.table(combined.loci, col.names=F, quote=F, row.names=F, file=outfile, sep="\t")
-
-}
-
-
-############################################
-# Mutation signatures
-############################################
-
-#' Obtain tri-nucleotide context. It reads in the supplied loci file and querries
-#' the provided reference genome fasta for the context. Finally it writes out the
-#' loci with annotated context.
-#' @param loci_file A 4 column loci file with chrom, position, reference allele and alt allele
-#' @param outfile Where to write the output
-#' @param ref_genome Full path to a reference genome Fasta file
-#' @author sd11
-#' @export
-getTrinucleotideContext = function(loci_file, outfile, ref_genome) {
-  loci = read.table(loci_file, sep='\t', header=F, stringsAsFactors=F)
-  loci.g = GenomicRanges::GRanges(seqnames=loci[,1], ranges=IRanges::IRanges(loci[,2], loci[,2]))
-  r = Rsamtools::scanFa(file=ref_genome, resize(GenomicRanges::granges(loci.g), 3, fix="center"))
-  write.table(cbind(loci, as.data.frame(r)), file=outfile, row.names=F, col.names=F, quote=F, sep="\t")
-}
-
-# #' Checks each tri-nucleotide context whether its CAG or CTG
-# #' @param vector_of_trinucleotides A vector containing the base to check and its immediate neighbors
-# #' @author sd11
-# isDeaminase = function(vector_of_trinucleotides) {
-#   return(grepl("(CAG)|(CTG)|(GAC)|(GTC)", vector_of_trinucleotides))
-# }
-
-#' Filter a with tri-nucleotide context annotated list of loci for a particular signature
-#' supplied as a regex like so: (CAG)|(CTG)|(GAC)|(GTC).
-#' @param signature_anno_loci_file Filepath to a with tri-nucleotide context annotated loci
-#' @param signature_regex A regex that captures the signature to keep.
-#' @param outfile Filepath to where to store the output.
-#' @param trinucleotide_column Integer representing the column within the input file that contains the context
-#' @param alt_alleles An optional vector with reference alleles to allow.
-#' @param alt_allele_column The column in the annotated loci file that contains the reference base.
-#' @author sd11
-#' @export
-filterForSignature = function(signature_anno_loci_file, signature_regex, outfile, trinucleotide_column=5, alt_alleles=NA, alt_allele_column=4) {
-  signature_anno_loci = read.table(signature_anno_loci_file, sep='\t', header=F, stringsAsFactors=F)
-  signature_anno_loci_filt = signature_anno_loci[grepl(signature_regex, signature_anno_loci[,trinucleotide_column]), ]
-
-  if (!is.na(alt_alleles)) {
-    regex_split = gsub("(", "", signature_regex, fixed=T)
-    regex_split = gsub(")", "", regex_split, fixed=T)
-    regex_split = unlist(strsplit(regex_split, "|", fixed=T))
-    selection = rep(F, nrow(signature_anno_loci_filt))
     
-    # Go through all signatures and their specific reference context
-    for (i in 1:length(regex_split)) {
-      alt_i = alt_alleles[i]
-      sign_i = regex_split[i]
-      # Select only those mutations that have this particular context and reference
-      selection[signature_anno_loci_filt[,trinucleotide_column]==sign_i & signature_anno_loci_filt[,alt_allele_column]==alt_i] = T
-    }
-    signature_anno_loci_filt = signature_anno_loci_filt[selection,]
+    ### adjusted by Shaghayegh
+    combined.loci.else[,1]<-gsub("chr","",combined.loci.else[,1])  
+    
+    
   }
-  write.table(signature_anno_loci_filt, file=outfile, row.names=F, col.names=F, quote=F, sep="\t")
+  ### merge both tables
+  
+  combined.loci<-rbind(combined.loci.snv,combined.loci.else)
+  combined.loci<-combined.loci[order(combined.loci[,1], combined.loci[,2]), ]
+  write.table(combined.loci, col.names=F, quote=F, row.names=F, file=outfile, sep="\t")
+  
 }
 
-#' Convenience function that filters a with tri-nucleotide context annotated list of loci for 
-#' cytosine deaminase signature, or C>T at CpG.
-#' @param loci_file Filepath to a with tri-nucleotide context annotated loci
-#' @param outfile Filepath to where to store the output.
-#' @param ref_genome Full path to an indexed reference genome fasta file
-#' @param trinucleotide_column Integer representing the column within the input file that contains the context
-#' @param alt_allele_column The column in the annotated loci file that contains the reference base.
-#' @author sd11
-#' @export
-filterForDeaminase = function(loci_file, outfile, ref_genome, trinucleotide_column=5, alt_allele_column=4) {
-  signature_anno_loci_file = gsub(".txt", "_signature_anno.txt", loci_file)
-  getTrinucleotideContext(loci_file, signature_anno_loci_file, ref_genome)
-  filterForSignature(signature_anno_loci_file=signature_anno_loci_file, 
-                     signature_regex="(CCG)|(GCC)|(CGG)|(GGC)", 
-                     outfile=outfile, 
-                     trinucleotide_column=trinucleotide_column, 
-                     alt_alleles=c("T", "T", "A", "A"), 
-                     alt_allele_column=alt_allele_column)
-}
+
 
 ############################################
 # MUT 2 MUT phasing
@@ -436,18 +331,18 @@ mut_cn_phasing = function(loci_file, phased_file, hap_file, bam_file, bai_file, 
 #' Main function that creates the DP input file. A higher level function should be called by users
 #' @noRd
 GetDirichletProcessInfo<-function(outputfile, cellularity, info, subclone.file, is.male = F, out.dir = NULL, SNP.phase.file = NULL, mut.phase.file = NULL, adjust_male_y_chrom=F){
-
+  
   write_output = function(info, outputfile) {
     if (!is.null(info)) {
-  	  # convert GenomicRanges object to df
-  	  df = data.frame(chr=as.data.frame(seqnames(info)),
-  			  start=start(info)-1,
-  			  end=end(info))
-            df = cbind(df, as.data.frame(elementMetadata(info)))
-            colnames(df)[1] = "chr"
-            df = df[with(df, order(chr)),]
-            print(head(df))
-            
+      # convert GenomicRanges object to df
+      df = data.frame(chr=as.data.frame(seqnames(info)),
+                      start=start(info)-1,
+                      end=end(info))
+      df = cbind(df, as.data.frame(elementMetadata(info)))
+      colnames(df)[1] = "chr"
+      df = df[with(df, order(chr)),]
+      print(head(df))
+      
     } else {
       df = data.frame(matrix(ncol=16, nrow=0))
       colnames(df) = c("chr", "start", "end", "WT.count", "mut.count", "subclonal.CN", "nMaj1","nMin1", "frac1", "nMaj2", "nMin2", "frac2", "phase", "mutation.copy.number", "subclonal.fraction", "no.chrs.bearing.mut")
@@ -464,7 +359,7 @@ GetDirichletProcessInfo<-function(outputfile, cellularity, info, subclone.file, 
   
   subclone.data = read.table(subclone.file,sep="\t",header=T,stringsAsFactors=F)
   subclone.data$chr<- gsub("chr","",subclone.data$chr)
-
+  
   # Add in the Y chrom if donor is male and Battenberg hasn't supplied it (BB returns X/Y ad multiple copies of X for men)
   if (is.male & (! "Y" %in% subclone.data$chr) & adjust_male_y_chrom) {
     subclone.data = addYchromToBattenberg(subclone.data)
@@ -508,13 +403,13 @@ GetDirichletProcessInfo<-function(outputfile, cellularity, info, subclone.file, 
   info$subclonal.fraction = info$mutation.copy.number
   expected.burden.for.MCN = dpclust3p:::mutationCopyNumberToMutationBurden(rep(1,length(info)),info$subclonal.CN,cellularity)
   info$no.chrs.bearing.mut = NA
-
+  
   # Check if any SNVs have a copy number state, if there are none we can stop here
   if (all(is.na(info$nMaj1))) {
-	  write_output(info, outputfile)
-	  return()
+    write_output(info, outputfile)
+    return()
   }
-
+  
   non.zero.indices = which(info$mut.count>0 & !is.na(expected.burden.for.MCN))
   #test for mutations in more than 1 copy
   p.vals = sapply(1:length(non.zero.indices),function(v,e,i){
@@ -705,60 +600,6 @@ runGetDirichletProcessInfo = function(loci_file, allele_frequencies_file, cellul
   GetDirichletProcessInfo(output_file, cellularity, info_counts, subclone_file, is.male=isMale, SNP.phase.file=SNP.phase.file, mut.phase.file=mut.phase.file)
 }
 
-##############################################
-# dpIn to VCF
-##############################################
-#' DPClust input file to vcf
-#' 
-#' Transform a dirichlet input file into a VCF with the same info. It filters out mutations in areas that are not contained in the supplied genome index (fai file) or are contained in the ignore file (ign file)
-#' It takes the DP input file created by runGetDirichletProcessInfo and combines the columns with the vcf file supplied. Finally it gzips and indexes the file
-#' @param vcf_infile Filename of the VCF file to use as a base
-#' @param dpIn_file Filename of a DP input file
-#' @param vcf_outfile Filename of the output file
-#' @param fai_file Path to a reference genome index containing chromosome names
-#' @param ign_file Path to a file containing contigs to ignore
-#' @param genome Specify the reference genome for reading in the VCF
-#' @author sd11
-#' @export
-dpIn2vcf = function(vcf_infile, dpIn_file, vcf_outfile, fai_file, ign_file, genome="hg19") {
-  vcf = VariantAnnotation::readVcf(vcf_infile, genome=genome)
-  
-  # Remove muts on chroms not to look at
-  fai = parseFai(fai_file)
-  ign = parseIgnore(ign_file)
-  allowed_chroms = which(!(fai$chromosome %in% ign$chromosome))
-  vcf = vcf[as.vector(seqnames(vcf)) %in% allowed_chroms,]
-  
-  # Read in the to be annotated data
-  dat = read.table(dpIn_file, header=T, stringsAsFactors=F)
-  
-  # Annotate the columns into the VCF object  
-  vcf = addVcfInfoCol(vcf, dat$WT.count, 1, "Integer", "Number of reads carrying the wild type allele", "WC")
-  vcf = addVcfInfoCol(vcf, dat$mut.count, 1, "Integer", "Number of reads carrying the mutant allele", "MC")
-  vcf = addVcfInfoCol(vcf, dat$subclonal.CN, 1, "Float", "Total subclonal copynumber", "TSC")
-  vcf = addVcfInfoCol(vcf, dat$nMaj1, 1, "Float", "Copynumber of major allele 1", "NMA1")
-  vcf = addVcfInfoCol(vcf, dat$nMin1, 1, "Float", "Copynumber of minor allele 1", "NMI1")
-  vcf = addVcfInfoCol(vcf, dat$frac1, 1, "Float", "Fraction of tumour cells containing copy number state 1", "FR1")
-  vcf = addVcfInfoCol(vcf, dat$nMaj2, 1, "Float", "Copynumber of major allele 2", "NMA2")
-  vcf = addVcfInfoCol(vcf, dat$nMin2, 1, "Float", "Copynumber of minor allele 2", "NMI2")
-  vcf = addVcfInfoCol(vcf, dat$frac2, 1, "Float", "Fraction of tumour cells containing copy number state 2", "FR2")
-  vcf = addVcfInfoCol(vcf, dat$phase, 1, "String", "Phase relation mutation and copynumber", "PHS")
-  vcf = addVcfInfoCol(vcf, dat$mutation.copy.number, 1, "Float", "Mutation copy number", "MCN")
-  vcf = addVcfInfoCol(vcf, dat$subclonal.fraction, 1, "Float", "Fraction of tumour cells carying this mutation", "CCF")
-  vcf = addVcfInfoCol(vcf, dat$no.chrs.bearing.mut, 1, "Float", "Number of chromosomes bearing the mutation", "NCBM")
-  
-  # Write the output, gzip and index it
-  VariantAnnotation::writeVcf(vcf, file=vcf_outfile, index=T)
-}
-
-#' Convenience function that annotates a column into the supplied VCF object
-#' @noRd
-addVcfInfoCol = function(vcf, data, number, type, description, abbreviation) {
-  i = header(vcf)@header$INFO
-  exptData(vcf)$header@header$INFO <- rbind(i, S4Vectors::DataFrame(Number=number, Type=type, Description=description, row.names=abbreviation))
-  info(vcf)[,abbreviation] <- as(data, "CharacterList")
-  return(vcf)
-}
 
 ##############################################
 # Produce project master file

@@ -8,11 +8,14 @@
 #' Dump allele counts stored in the sample columns of the maf file. Output will go into a file
 #' supplied as tumour_outfile and optionally normal_outfile. It will be a fully formatted
 #' allele counts file as returned by alleleCounter.
+#'
 #' @param maf_file The maf file to read in
 #' @param tumour_outfile File to save the tumour counts to
 #' @param normal_outfile Optional parameter specifying where the normal output should go
-#' @param refence_genome Optional parameter specifying the reference genome build used
+#' @param dummy_alt_allele 
+#' @param dummy_ref_allele 
 #' @param samplename Optional parameter specifying the samplename to be used for matching the right column in the maf
+#'
 #' @author sd11
 #' @export
 
@@ -118,15 +121,15 @@ dumpCounts.maf = function(maf_file, tumour_outfile,  normal_outfile=NA, samplena
 ###############################################
 
 
-alleleCount = function(locifile, bam, outfile, min_baq=20, min_maq=35) {
-  cmd = paste(ALLELECOUNTER,
-              "-b", bam,
-              "-o", outfile,
-              "-l", locifile,
-              "-m", min_baq,
-              "-q", min_maq, sep=" ")
-  system(cmd, wait=T)
-}
+#alleleCount = function(locifile, bam, outfile, min_baq=20, min_maq=35) {
+#  cmd = paste(ALLELECOUNTER,
+#              "-b", bam,
+#              "-o", outfile,
+#              "-l", locifile,
+#              "-m", min_baq,
+#              "-q", min_maq, sep=" ")
+#  system(cmd, wait=T)
+#}
 
 #' Obtain alt allele for all variants as a vector
 #' 
@@ -135,17 +138,17 @@ alleleCount = function(locifile, bam, outfile, min_baq=20, min_maq=35) {
 #' @return A vector with the alt allele
 #' @author sd11
 #' @export
-getAltAllele = function(vcf) {
-  clist = CharacterList(VariantAnnotation::alt(vcf))
+#getAltAllele = function(vcf) {
+  #clist = CharacterList(VariantAnnotation::alt(vcf))
   #mult = elementNROWS(clist) > 1L
-  mult = elementLengths(clist) > 1L 
-  if (any(mult)) {
-    warning(paste("Took first alt allele only for these variants: ", paste(seqnames(vcf), start(vcf))))
-  }
+  #mult = elementLengths(clist) > 1L 
+  #if (any(mult)) {
+    #warning(paste("Took first alt allele only for these variants: ", paste(seqnames(vcf), start(vcf))))
+  #}
   
-  clist[mult] = lapply(clist[mult], paste0, collapse=",")
-  return(unlist(clist))
-}
+#  clist[mult] = lapply(clist[mult], paste0, collapse=",")
+#  return(unlist(clist))
+#}
 
 #' Dump allele counts from vcf - Sanger ICGC pancancer pipeline
 #'
@@ -159,9 +162,9 @@ getAltAllele = function(vcf) {
 #' @param samplename Optional parameter specifying the samplename to be used for matching the right column in the VCF
 #' @author sd11
 #' @export
-dumpCounts.Sanger = function(vcf_infile, tumour_outfile, normal_outfile=NA, refence_genome="hg19", samplename=NA) {
-  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="sanger", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
-}
+#dumpCounts.Sanger = function(vcf_infile, tumour_outfile, normal_outfile=NA, refence_genome="hg19", samplename=NA) {
+#  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="sanger", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
+#}
 
 #' Dump allele counts from vcf - DKFZ ICGC pancancer pipeline
 #'
@@ -175,9 +178,9 @@ dumpCounts.Sanger = function(vcf_infile, tumour_outfile, normal_outfile=NA, refe
 #' @param samplename Optional parameter specifying the samplename to be used for matching the right column in the VCF
 #' @author sd11
 #' @export
-dumpCounts.DKFZ = function(vcf_infile, tumour_outfile, normal_outfile=NA, refence_genome="hg19", samplename=NA) {
-  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="dkfz", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
-}
+#dumpCounts.DKFZ = function(vcf_infile, tumour_outfile, normal_outfile=NA, refence_genome="hg19", samplename=NA) {
+#  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="dkfz", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
+#}
 
 #' Dump allele counts from vcf - Broad ICGC pancancer pipeline
 #'
@@ -191,9 +194,9 @@ dumpCounts.DKFZ = function(vcf_infile, tumour_outfile, normal_outfile=NA, refenc
 #' @param samplename Optional parameter specifying the samplename to be used for matching the right column in the VCF
 #' @author sd11
 #' @export
-dumpCounts.Broad = function(vcf_infile, tumour_outfile, normal_outfile=NA, refence_genome="hg19", samplename=NA) {
-  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="broad", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
-}
+#dumpCounts.Broad = function(vcf_infile, tumour_outfile, normal_outfile=NA, refence_genome="hg19", samplename=NA) {
+#  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="broad", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
+#}
 
 #' Dump allele counts from vcf - MuSE ICGC pancancer pipeline
 #'
@@ -207,9 +210,9 @@ dumpCounts.Broad = function(vcf_infile, tumour_outfile, normal_outfile=NA, refen
 #' @param samplename Optional parameter specifying the samplename to be used for matching the right column in the VCF
 #' @author sd11
 #' @export
-dumpCounts.Muse = function(vcf_infile, tumour_outfile, normal_outfile=NA, refence_genome="hg19", samplename=NA) {
-  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="muse", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
-}
+#dumpCounts.Muse = function(vcf_infile, tumour_outfile, normal_outfile=NA, refence_genome="hg19", samplename=NA) {
+#  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="muse", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
+#}
 
 #' Dump allele counts from vcf - ICGC pancancer consensus SNV pipeline
 #'
@@ -223,9 +226,9 @@ dumpCounts.Muse = function(vcf_infile, tumour_outfile, normal_outfile=NA, refenc
 #' @param samplename Optional parameter specifying the samplename to be used for matching the right column in the VCF
 #' @author sd11
 #' @export
-dumpCounts.ICGCconsensusSNV = function(vcf_infile, tumour_outfile, normal_outfile=NA, refence_genome="hg19", samplename=NA) {
-  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="icgc_consensus_snv", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
-}
+#dumpCounts.ICGCconsensusSNV = function(vcf_infile, tumour_outfile, normal_outfile=NA, refence_genome="hg19", samplename=NA) {
+#  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="icgc_consensus_snv", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
+#}
 
 #' Dump allele counts from vcf - ICGC pancancer consensus indel pipeline
 #'
@@ -239,9 +242,9 @@ dumpCounts.ICGCconsensusSNV = function(vcf_infile, tumour_outfile, normal_outfil
 #' @param dummy_ref_allele Specify allele to be used to encode the ref counts (the indel can be multiple alleles)
 #' @author sd11
 #' @export
-dumpCounts.ICGCconsensusIndel = function(vcf_infile, tumour_outfile, refence_genome="hg19", dummy_alt_allele=NA, dummy_ref_allele=NA) {
-  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="icgc_consensus_indel", normal_outfile=NA, refence_genome=refence_genome, samplename=NA, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele)
-}
+#dumpCounts.ICGCconsensusIndel = function(vcf_infile, tumour_outfile, refence_genome="hg19", dummy_alt_allele=NA, dummy_ref_allele=NA) {
+#  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="icgc_consensus_indel", normal_outfile=NA, refence_genome=refence_genome, samplename=NA, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele)
+#}
 
 #' Dump allele counts from vcf - Strelka indel pipeline
 #'
@@ -255,9 +258,9 @@ dumpCounts.ICGCconsensusIndel = function(vcf_infile, tumour_outfile, refence_gen
 #' @param dummy_ref_allele Specify allele to be used to encode the ref counts (the indel can be multiple alleles)
 #' @author sd11
 #' @export
-dumpCounts.StrelkaIndel = function(vcf_infile, tumour_outfile, refence_genome="hg19", dummy_alt_allele=NA, dummy_ref_allele=NA) {
-	dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="strelka_indel", normal_outfile=NA, refence_genome=refence_genome, samplename=NA, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele)
-}
+#dumpCounts.StrelkaIndel = function(vcf_infile, tumour_outfile, refence_genome="hg19", dummy_alt_allele=NA, dummy_ref_allele=NA) {
+#	dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="strelka_indel", normal_outfile=NA, refence_genome=refence_genome, samplename=NA, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele)
+#}
 
 #' Dump allele counts from vcf - CGP Pindel indel pipeline
 #'
@@ -271,9 +274,9 @@ dumpCounts.StrelkaIndel = function(vcf_infile, tumour_outfile, refence_genome="h
 #' @param dummy_ref_allele Specify allele to be used to encode the ref counts (the indel can be multiple alleles)
 #' @author sd11
 #' @export
-dumpCounts.cgpPindel = function(vcf_infile, tumour_outfile, refence_genome="hg19", dummy_alt_allele=NA, dummy_ref_allele=NA) {
-  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="cgppindel_indel", normal_outfile=NA, refence_genome=refence_genome, samplename=samplename, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele)
-}
+#dumpCounts.cgpPindel = function(vcf_infile, tumour_outfile, refence_genome="hg19", dummy_alt_allele=NA, dummy_ref_allele=NA) {
+#  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="cgppindel_indel", normal_outfile=NA, refence_genome=refence_genome, samplename=samplename, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele)
+#}
 
 #' Dump allele counts from vcf - Mutect
 #'
@@ -287,9 +290,9 @@ dumpCounts.cgpPindel = function(vcf_infile, tumour_outfile, refence_genome="hg19
 #' @param refence_genome Optional parameter specifying the reference genome build used
 #' @author sd11
 #' @export
-dumpCounts.mutect = function(vcf_infile, tumour_outfile, samplename, normal_outfile=NA, refence_genome="hg19") {
-  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="mutect", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
-}
+#dumpCounts.mutect = function(vcf_infile, tumour_outfile, samplename, normal_outfile=NA, refence_genome="hg19") {
+#  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="mutect", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename)
+#}
 
 #' Dump allele counts from vcf - Scalpel
 #'
@@ -303,55 +306,55 @@ dumpCounts.mutect = function(vcf_infile, tumour_outfile, samplename, normal_outf
 #' @param refence_genome Optional parameter specifying the reference genome build used
 #' @author sd11
 #' @export
-dumpCounts.scalpel = function(vcf_infile, tumour_outfile, samplename, normal_outfile=NA, refence_genome="hg19", dummy_alt_allele=NA, dummy_ref_allele=NA) {
-  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="scalpel_indel", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele)
-}
+#dumpCounts.scalpel = function(vcf_infile, tumour_outfile, samplename, normal_outfile=NA, refence_genome="hg19", dummy_alt_allele=NA, dummy_ref_allele=NA) {
+#  dumpCountsFromVcf(vcf_infile, tumour_outfile, centre="scalpel_indel", normal_outfile=normal_outfile, refence_genome=refence_genome, samplename=samplename, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele)
+#}
 
 #' Dump allele counts from VCF
 #' 
 #' This function implements all the steps required for dumping counts from VCF
 #' as supplied by the ICGC pancancer pipelines. 
 #' @noRd
-dumpCountsFromVcf = function(vcf_infile, tumour_outfile, centre, normal_outfile=NA, refence_genome="hg19", samplename=NA, dummy_alt_allele=NA, dummy_ref_allele=NA) {
+#dumpCountsFromVcf = function(vcf_infile, tumour_outfile, centre, normal_outfile=NA, refence_genome="hg19", samplename=NA, dummy_alt_allele=NA, dummy_ref_allele=NA) {
   # Helper function for writing the output  
-  write.output = function(output, output_file) {
-    write.table(output, file=output_file, col.names=T, quote=F, row.names=F, sep="\t")
-  }
+  #write.output = function(output, output_file) {
+    #write.table(output, file=output_file, col.names=T, quote=F, row.names=F, sep="\t")
+#  }
   
   # Read in the vcf and dump the tumour counts in the right format
-  v = VariantAnnotation::readVcf(vcf_infile, refence_genome)
-  if (nrow(v) > 0) {
-    tumour = getCountsTumour(v, centre=centre, samplename=samplename, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele)
-  } else {
-    tumour = NA
-  }
-  tumour = formatOutput(tumour, v)
-  write.output(tumour, tumour_outfile)
+  #v = VariantAnnotation::readVcf(vcf_infile, refence_genome)
+  #if (nrow(v) > 0) {
+    #tumour = getCountsTumour(v, centre=centre, samplename=samplename, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele)
+  #} else {
+    #tumour = NA
+  #}
+  #tumour = formatOutput(tumour, v)
+  #write.output(tumour, tumour_outfile)
   
-  # Optionally dump the normal counts in the right format
-  if (!is.na(normal_outfile)) {
-    if (nrow(v) > 0) {
-      normal = getCountsNormal(v, centre=centre, samplename=samplename)
-    } else {
-      normal = NA
-    }
-    normal = formatOutput(normal, v)
-    write.output(normal, normal_outfile)
-  }
-}
+#   Optionally dump the normal counts in the right format
+#  if (!is.na(normal_outfile)) {
+#    if (nrow(v) > 0) {
+#      normal = getCountsNormal(v, centre=centre, samplename=samplename)
+#    } else {
+#      normal = NA
+#    }
+#    normal = formatOutput(normal, v)
+#    write.output(normal, normal_outfile)
+#  }
+#}
 
 #' Format a 4 column counts table into the alleleCounter format. This function assumes A, C, G, T format.
 #' @noRd
-formatOutput = function(counts_table, v) {
+#formatOutput = function(counts_table, v) {
   # Check if the vcf object is empty, if so, generate dummy data
-  if (nrow(v)==0) {
-    output = data.frame(matrix(ncol = 7, nrow = 0))
-  } else {
-    output = data.frame(as.character(seqnames(v)), start(ranges(v)), counts_table, rowSums(counts_table))
-  }
-  colnames(output) = c("#CHR","POS","Count_A","Count_C","Count_G","Count_T","Good_depth")
-  return(output)
-}
+  #if (nrow(v)==0) {
+    #output = data.frame(matrix(ncol = 7, nrow = 0))
+  #} else {
+    #output = data.frame(as.character(seqnames(v)), start(ranges(v)), counts_table, rowSums(counts_table))
+  #}
+  #colnames(output) = c("#CHR","POS","Count_A","Count_C","Count_G","Count_T","Good_depth")
+  #return(output)
+#}
 
 #' Dump allele counts from vcf for normal
 #' 
@@ -361,38 +364,38 @@ formatOutput = function(counts_table, v) {
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getCountsNormal = function(v, centre="sanger", samplename=NA) {
-  if (centre=="sanger") {
-    return(getAlleleCounts.Sanger(v, 1))
-  } else if(centre=="dkfz") {
-    sample_col = which(colnames(VariantAnnotation::geno(v)$DP4) == "CONTROL")
-    return(getAlleleCounts.DKFZ(v, sample_col))
-  } else if (centre=="muse") {
-    # Assuming the tumour name is provided
-    sample_col = which(colnames(VariantAnnotation::geno(v)$AD) != samplename)
-    return (getAlleleCounts.MuSE(v, sample_col))
-  } else if (centre=="broad") {
-    print("The Broad ICGC pipeline does not report allele counts for the matched normal")
-    q(save="no", status=1)
-  } else if (centre=="icgc_consensus_snv") {
-    print("The ICGC consensus pipeline does not report allele counts for the matched normal")
-    q(save="no", status=1)
-  } else if (centre=="icgc_consensus_indel") {
-    print("The ICGC consensus indel pipeline does not report allele counts for the matched normal")
-    q(save="no", status=1)
-  } else if (centre=="mutect") {
-    sample_col = which(colnames(VariantAnnotation::geno(v)$AD) == samplename)
-    return(getAlleleCounts.mutect(v, sample_col))
-  } else if (centre=="scalpel_indel") {
-    if (is.na(dummy_alt_allele) | is.na(dummy_ref_allele)) { stop("When dumping allele counts from the Scalpel indels dummy_alt_allele and dummy_ref_allele must be supplied") }
-    if (!any(colnames(geno(v)[[1]])=="NORMAL")) { stop("Expect Scalpel normal VCF column to contain header NORMAL") }
-    sample_col = which(colnames(geno(v)[[1]])=="NORMAL")
-    return(getAlleleCounts.Scalpel_indel(v, sample_col=sample_col, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele))
-  } else {
-    print(paste("Supplied centre not supported:", centre))
-    q(save="no", status=1)
-  }
-}
+#getCountsNormal = function(v, centre="sanger", samplename=NA) {
+#  if (centre=="sanger") {
+#    return(getAlleleCounts.Sanger(v, 1))
+#  } else if(centre=="dkfz") {
+#    sample_col = which(colnames(VariantAnnotation::geno(v)$DP4) == "CONTROL")
+#    return(getAlleleCounts.DKFZ(v, sample_col))
+#  } else if (centre=="muse") {
+#    # Assuming the tumour name is provided
+#    sample_col = which(colnames(VariantAnnotation::geno(v)$AD) != samplename)
+#    return (getAlleleCounts.MuSE(v, sample_col))
+#  } else if (centre=="broad") {
+#    print("The Broad ICGC pipeline does not report allele counts for the matched normal")
+#    q(save="no", status=1)
+#  } else if (centre=="icgc_consensus_snv") {
+#    print("The ICGC consensus pipeline does not report allele counts for the matched normal")
+#    q(save="no", status=1)
+#  } else if (centre=="icgc_consensus_indel") {
+#    print("The ICGC consensus indel pipeline does not report allele counts for the matched normal")
+#    q(save="no", status=1)
+#  } else if (centre=="mutect") {
+#    sample_col = which(colnames(VariantAnnotation::geno(v)$AD) == samplename)
+#    return(getAlleleCounts.mutect(v, sample_col))
+#  } else if (centre=="scalpel_indel") {
+#    if (is.na(dummy_alt_allele) | is.na(dummy_ref_allele)) { stop("When dumping allele counts from the Scalpel indels dummy_alt_allele and dummy_ref_allele must be supplied") }
+#    if (!any(colnames(geno(v)[[1]])=="NORMAL")) { stop("Expect Scalpel normal VCF column to contain header NORMAL") }
+#    sample_col = which(colnames(geno(v)[[1]])=="NORMAL")
+#    return(getAlleleCounts.Scalpel_indel(v, sample_col=sample_col, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele))
+#  } else {
+#    print(paste("Supplied centre not supported:", centre))
+#    q(save="no", status=1)
+#  }
+#}
 
 #' Dump allele counts from vcf for tumour
 #' 
@@ -405,44 +408,44 @@ getCountsNormal = function(v, centre="sanger", samplename=NA) {
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getCountsTumour = function(v, centre="sanger", samplename=NA, dummy_alt_allele=NA, dummy_ref_allele=NA) {
-  if (centre=="sanger") {
-    return(getAlleleCounts.Sanger(v, 2))
-  } else if (centre=="dkfz") {
-    sample_col = which(colnames(VariantAnnotation::geno(v)$DP4) == "TUMOR")
-    return(getAlleleCounts.DKFZ(v, sample_col))
-  } else if (centre=="muse") {
-    if (is.na(samplename)) { stop("When dumping allele counts from the Muse samplename must be supplied") }
-    sample_col = which(colnames(VariantAnnotation::geno(v)$AD) == samplename)
-    return (getAlleleCounts.MuSE(v, sample_col))
-  } else if (centre=="broad") {
-    if (is.na(samplename)) { stop("When dumping allele counts from the Broad ICGC pipeline samplename must be supplied") }
-    return(getAlleleCounts.Broad(v, 1))
-  } else if (centre=="icgc_consensus_snv") {
-    return(getAlleleCounts.ICGC_consensus_snv(v))
-  } else if (centre=="icgc_consensus_indel") {
-    if (is.na(dummy_alt_allele) | is.na(dummy_ref_allele)) { stop("When dumping allele counts from the ICGC consensus indels dummy_alt_allele and dummy_ref_allele must be supplied") }
-    return(getAlleleCounts.ICGC_consensus_indel(v, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele))
-  } else if (centre=="mutect") {
-    if (is.na(samplename)) { stop("When dumping allele counts from the Mutect samplename must be supplied") }
-    sample_col = which(colnames(VariantAnnotation::geno(v)$AD) == samplename)
-    return(getAlleleCounts.mutect(v, sample_col))
-  } else if (centre=="strelka_indel") {
-    if (is.na(dummy_alt_allele) | is.na(dummy_ref_allele)) { stop("When dumping allele counts from the Strelka indels dummy_alt_allele and dummy_ref_allele must be supplied") }
-    return(getAlleleCounts.Strelka_indel(v, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele))
-  } else if (centre=="scalpel_indel") {
-    if (is.na(dummy_alt_allele) | is.na(dummy_ref_allele)) { stop("When dumping allele counts from the Scalpel indels dummy_alt_allele and dummy_ref_allele must be supplied") }
-    if (!any(colnames(geno(v)[[1]])=="TUMOUR")) { stop("Expect Scalpel tumour VCF column to contain header TUMOUR") }
-    sample_col = which(colnames(geno(v)[[1]])=="TUMOUR")
-    return(getAlleleCounts.Scalpel_indel(v, sample_col=sample_col, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele))
-  } else if (centre=="cgppindel_indel") {
-    sample_col = which(colnames(geno(v)$WTR)==samplename)
-    return(getAlleleCounts.cgpPindel_indel(v, sample_col=sample_col, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele))
-  } else {
-    print(paste("Supplied centre not supported:", centre))
-    q(save="no", status=1)
-  }
-}
+#getCountsTumour = function(v, centre="sanger", samplename=NA, dummy_alt_allele=NA, dummy_ref_allele=NA) {
+#  if (centre=="sanger") {
+#    return(getAlleleCounts.Sanger(v, 2))
+#  } else if (centre=="dkfz") {
+#    sample_col = which(colnames(VariantAnnotation::geno(v)$DP4) == "TUMOR")
+#    return(getAlleleCounts.DKFZ(v, sample_col))
+#  } else if (centre=="muse") {
+#    if (is.na(samplename)) { stop("When dumping allele counts from the Muse samplename must be supplied") }
+#    sample_col = which(colnames(VariantAnnotation::geno(v)$AD) == samplename)
+#    return (getAlleleCounts.MuSE(v, sample_col))
+#  } else if (centre=="broad") {
+#    if (is.na(samplename)) { stop("When dumping allele counts from the Broad ICGC pipeline samplename must be supplied") }
+#    return(getAlleleCounts.Broad(v, 1))
+#  } else if (centre=="icgc_consensus_snv") {
+#    return(getAlleleCounts.ICGC_consensus_snv(v))
+#  } else if (centre=="icgc_consensus_indel") {
+#    if (is.na(dummy_alt_allele) | is.na(dummy_ref_allele)) { stop("When dumping allele counts from the ICGC consensus indels dummy_alt_allele and dummy_ref_allele must be supplied") }
+#    return(getAlleleCounts.ICGC_consensus_indel(v, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele))
+#  } else if (centre=="mutect") {
+#    if (is.na(samplename)) { stop("When dumping allele counts from the Mutect samplename must be supplied") }
+#    sample_col = which(colnames(VariantAnnotation::geno(v)$AD) == samplename)
+#    return(getAlleleCounts.mutect(v, sample_col))
+#  } else if (centre=="strelka_indel") {
+#    if (is.na(dummy_alt_allele) | is.na(dummy_ref_allele)) { stop("When dumping allele counts from the Strelka indels dummy_alt_allele and dummy_ref_allele must be supplied") }
+#    return(getAlleleCounts.Strelka_indel(v, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele))
+#  } else if (centre=="scalpel_indel") {
+#    if (is.na(dummy_alt_allele) | is.na(dummy_ref_allele)) { stop("When dumping allele counts from the Scalpel indels dummy_alt_allele and dummy_ref_allele must be supplied") }
+#    if (!any(colnames(geno(v)[[1]])=="TUMOUR")) { stop("Expect Scalpel tumour VCF column to contain header TUMOUR") }
+#    sample_col = which(colnames(geno(v)[[1]])=="TUMOUR")
+#    return(getAlleleCounts.Scalpel_indel(v, sample_col=sample_col, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele))
+#  } else if (centre=="cgppindel_indel") {
+#    sample_col = which(colnames(geno(v)$WTR)==samplename)
+#    return(getAlleleCounts.cgpPindel_indel(v, sample_col=sample_col, dummy_alt_allele=dummy_alt_allele, dummy_ref_allele=dummy_ref_allele))
+#  } else {
+#    print(paste("Supplied centre not supported:", centre))
+#    q(save="no", status=1)
+#  }
+#}
 
 #' Dump allele counts from Sanger pipeline vcf
 #' 
@@ -452,12 +455,12 @@ getCountsTumour = function(v, centre="sanger", samplename=NA, dummy_alt_allele=N
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getAlleleCounts.Sanger = function(v, sample_col) {
-  return(cbind(VariantAnnotation::geno(v)$FAZ[,sample_col]+VariantAnnotation::geno(v)$RAZ[,sample_col], 
-               VariantAnnotation::geno(v)$FCZ[,sample_col]+VariantAnnotation::geno(v)$RCZ[,sample_col], 
-               VariantAnnotation::geno(v)$FGZ[,sample_col]+VariantAnnotation::geno(v)$RGZ[,sample_col], 
-               VariantAnnotation::geno(v)$FTZ[,sample_col]+VariantAnnotation::geno(v)$RTZ[,sample_col]))
-}
+#getAlleleCounts.Sanger = function(v, sample_col) {
+#  return(cbind(VariantAnnotation::geno(v)$FAZ[,sample_col]+VariantAnnotation::geno(v)$RAZ[,sample_col], 
+#               VariantAnnotation::geno(v)$FCZ[,sample_col]+VariantAnnotation::geno(v)$RCZ[,sample_col], 
+#               VariantAnnotation::geno(v)$FGZ[,sample_col]+VariantAnnotation::geno(v)$RGZ[,sample_col], 
+#               VariantAnnotation::geno(v)$FTZ[,sample_col]+VariantAnnotation::geno(v)$RTZ[,sample_col]))
+#}
 
 #' Dump allele counts from the DKFZ pipeline
 #' 
@@ -471,18 +474,18 @@ getAlleleCounts.Sanger = function(v, sample_col) {
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getAlleleCounts.DKFZ = function(v, sample_col) {
-  # Fetch counts for both forward and reverse ref/alt
-  counts = VariantAnnotation::geno(v)$DP4[,sample_col,]
-  counts.ref = counts[,1] + counts[,2] # ref forward/reverse
-  counts.alt = counts[,3] + counts[,4] # alt forward/reverse
-  allele.ref = as.character(VariantAnnotation::ref(v))
-  # allele.alt = unlist(lapply(VariantAnnotation::alt(v), function(x) { as.character(x[[1]]) }))
-  allele.alt = getAltAllele(v)
-  
-  output = construct_allelecounter_table(count.ref, count.alt, allele.ref, allele.alt)
-  return(output)
-}
+#getAlleleCounts.DKFZ = function(v, sample_col) {
+#  # Fetch counts for both forward and reverse ref/alt
+#  counts = VariantAnnotation::geno(v)$DP4[,sample_col,]
+#  counts.ref = counts[,1] + counts[,2] # ref forward/reverse
+#  counts.alt = counts[,3] + counts[,4] # alt forward/reverse
+#  allele.ref = as.character(VariantAnnotation::ref(v))
+#  # allele.alt = unlist(lapply(VariantAnnotation::alt(v), function(x) { as.character(x[[1]]) }))
+#  allele.alt = getAltAllele(v)
+#  
+#  output = construct_allelecounter_table(count.ref, count.alt, allele.ref, allele.alt)
+#  return(output)
+#}
 
 #' Dump allele counts from the MuSE pipeline
 #' 
@@ -497,30 +500,30 @@ getAlleleCounts.DKFZ = function(v, sample_col) {
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getAlleleCounts.MuSE = function(v, sample_col) {
-  if (length(colnames(VariantAnnotation::geno(v)$AD)) > 2) {
-    print("In getAlleleCounts.MuSE: Assuming 2 columns with read counts, but found more. This is not supported")
-    q(save="no", status=1)
-  }
-  
+#getAlleleCounts.MuSE = function(v, sample_col) {
+#  if (length(colnames(VariantAnnotation::geno(v)$AD)) > 2) {
+#    print("In getAlleleCounts.MuSE: Assuming 2 columns with read counts, but found more. This is not supported")
+#    q(save="no", status=1)
+#  }
+#  
   # An SNV can be represented by more than 1 alt alleles, here we pick the alt allele with the highest read count
-  num.snvs = nrow(VariantAnnotation::geno(v)$AD)
-  counts = array(NA, c(num.snvs, 2))
-  allele.alt = array(NA, num.snvs)
-  for (i in 1:num.snvs) {
-    snv.counts = unlist(VariantAnnotation::geno(v)$AD[i,sample_col])
-    counts[i,1] = snv.counts[1] # The reference is the first base for which read counts are mentioned
-    select_base = which.max(snv.counts[2:length(snv.counts)])
-    allele.alt[i] = as.character(VariantAnnotation::alt(v)[[i]][select_base])
-    select_base = select_base+1 # The reference is the first base for which read counts are mentioned
-    counts[i,2] = snv.counts[select_base] 
-  }
+#  num.snvs = nrow(VariantAnnotation::geno(v)$AD)
+#  counts = array(NA, c(num.snvs, 2))
+#  allele.alt = array(NA, num.snvs)
+#  for (i in 1:num.snvs) {
+#    snv.counts = unlist(VariantAnnotation::geno(v)$AD[i,sample_col])
+#    counts[i,1] = snv.counts[1] # The reference is the first base for which read counts are mentioned
+#    select_base = which.max(snv.counts[2:length(snv.counts)])
+#    allele.alt[i] = as.character(VariantAnnotation::alt(v)[[i]][select_base])
+#    select_base = select_base+1 # The reference is the first base for which read counts are mentioned
+#    counts[i,2] = snv.counts[select_base] 
+#  }
   
-  allele.ref = as.character(VariantAnnotation::ref(v))
-  
-  output = construct_allelecounter_table(counts[i,1], counts[i,2], allele.ref, allele.alt)
-  return(output)
-}
+#  allele.ref = as.character(VariantAnnotation::ref(v))
+#  
+#  output = construct_allelecounter_table(counts[i,1], counts[i,2], allele.ref, allele.alt)
+#  return(output)
+#}
 
 #' Dump allele counts from the Broad pipeline
 #' 
@@ -534,16 +537,16 @@ getAlleleCounts.MuSE = function(v, sample_col) {
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getAlleleCounts.Broad = function(v, sample_col) {
-  count.ref = as.numeric(unlist(VariantAnnotation::geno(v)$ref_count))
-  count.alt = as.numeric(unlist(VariantAnnotation::geno(v)$alt_count))
-  allele.ref = as.character(VariantAnnotation::ref(v))
-  # allele.alt = unlist(lapply(VariantAnnotation::alt(v), function(x) { as.character(x[[1]]) }))
-  allele.alt = getAltAllele(v)
+#getAlleleCounts.Broad = function(v, sample_col) {
+#  count.ref = as.numeric(unlist(VariantAnnotation::geno(v)$ref_count))
+#  count.alt = as.numeric(unlist(VariantAnnotation::geno(v)$alt_count))
+#  allele.ref = as.character(VariantAnnotation::ref(v))
+#  # allele.alt = unlist(lapply(VariantAnnotation::alt(v), function(x) { as.character(x[[1]]) }))
+#  allele.alt = getAltAllele(v)
   
-  output = construct_allelecounter_table(count.ref, count.alt, allele.ref, allele.alt)
-  return(output)
-}
+#  output = construct_allelecounter_table(count.ref, count.alt, allele.ref, allele.alt)
+#  return(output)
+#}
 
 #' Dump allele counts in ICGC consensus SNV format
 #' 
@@ -553,16 +556,16 @@ getAlleleCounts.Broad = function(v, sample_col) {
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getAlleleCounts.ICGC_consensus_snv = function(v) {
-  count.alt = info(v)$t_alt_count
-  count.ref = info(v)$t_ref_count
-  allele.ref = as.character(VariantAnnotation::ref(v))
-  # allele.alt = unlist(lapply(VariantAnnotation::alt(v), function(x) { as.character(x[[1]]) }))
-  allele.alt = getAltAllele(v)
-  
-  output = construct_allelecounter_table(count.ref, count.alt, allele.ref, allele.alt)
-  return(output)
-}
+#getAlleleCounts.ICGC_consensus_snv = function(v) {
+#  count.alt = info(v)$t_alt_count
+#  count.ref = info(v)$t_ref_count
+#  allele.ref = as.character(VariantAnnotation::ref(v))
+#  # allele.alt = unlist(lapply(VariantAnnotation::alt(v), function(x) { as.character(x[[1]]) }))
+#  allele.alt = getAltAllele(v)
+#  
+#  output = construct_allelecounter_table(count.ref, count.alt, allele.ref, allele.alt)
+#  return(output)
+#}
 
 #' Dump allele counts in ICGC consensus indel format
 #' 
@@ -574,13 +577,13 @@ getAlleleCounts.ICGC_consensus_snv = function(v) {
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getAlleleCounts.ICGC_consensus_indel = function(v, dummy_alt_allele="A", dummy_ref_allele="C") {
-  c = construct_allelecounter_table(count.ref=info(v)$t_ref_count, 
-                                    count.alt=info(v)$t_alt_count, 
-                                    allele.ref=rep(dummy_ref_allele, nrow(v)),
-                                    allele.alt=rep(dummy_alt_allele, nrow(v)))
-  return(c)
-}
+#getAlleleCounts.ICGC_consensus_indel = function(v, dummy_alt_allele="A", dummy_ref_allele="C") {
+#  c = construct_allelecounter_table(count.ref=info(v)$t_ref_count, 
+#                                    count.alt=info(v)$t_alt_count, 
+#                                    allele.ref=rep(dummy_ref_allele, nrow(v)),
+#                                    allele.alt=rep(dummy_alt_allele, nrow(v)))
+#  return(c)
+#}
 
 #' Dump allele counts in Strelka indel format
 #'
@@ -592,13 +595,13 @@ getAlleleCounts.ICGC_consensus_indel = function(v, dummy_alt_allele="A", dummy_r
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getAlleleCounts.Strelka_indel = function(v, dummy_alt_allele="A", dummy_ref_allele="C") {
-  c = construct_allelecounter_table(count.ref=geno(v)$TAR[,2,1],
-				    count.alt=geno(v)$TIR[,2,1],
-				    allele.ref=rep(dummy_ref_allele, nrow(v)),
-				    allele.alt=rep(dummy_alt_allele, nrow(v)))
-  return(c)
-}
+#getAlleleCounts.Strelka_indel = function(v, dummy_alt_allele="A", dummy_ref_allele="C") {
+#  c = construct_allelecounter_table(count.ref=geno(v)$TAR[,2,1],
+#				    count.alt=geno(v)$TIR[,2,1],
+#				    allele.ref=rep(dummy_ref_allele, nrow(v)),
+#				    allele.alt=rep(dummy_alt_allele, nrow(v)))
+#  return(c)
+#}
 
 #' Dump allele counts in cgpPindel indel format
 #'
@@ -611,13 +614,13 @@ getAlleleCounts.Strelka_indel = function(v, dummy_alt_allele="A", dummy_ref_alle
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getAlleleCounts.cgpPindel_indel = function(v, sample_col, dummy_alt_allele="A", dummy_ref_allele="C") {
-  c = construct_allelecounter_table(count.ref=geno(v)$WT[,sample_col],
-                                    count.alt=geno(v)$MTR[,sample_col],
-                                    allele.ref=rep(dummy_ref_allele, nrow(v)),
-                                    allele.alt=rep(dummy_alt_allele, nrow(v)))
-  return(c)
-}
+#getAlleleCounts.cgpPindel_indel = function(v, sample_col, dummy_alt_allele="A", dummy_ref_allele="C") {
+#  c = construct_allelecounter_table(count.ref=geno(v)$WT[,sample_col],
+#                                    count.alt=geno(v)$MTR[,sample_col],
+#                                    allele.ref=rep(dummy_ref_allele, nrow(v)),
+#                                    allele.alt=rep(dummy_alt_allele, nrow(v)))
+#  return(c)
+#}
 
 #' Dump allele counts in Scalpel indel format
 #'
@@ -630,14 +633,14 @@ getAlleleCounts.cgpPindel_indel = function(v, sample_col, dummy_alt_allele="A", 
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getAlleleCounts.Scalpel_indel = function(v, sample_col, dummy_alt_allele="A", dummy_ref_allele="C") {
-  counts = do.call(rbind, geno(v)$AD[,sample_col])
-  c = dpclust3p:::construct_allelecounter_table(count.ref=counts[,1],
-                                                count.alt=counts[,2],
-                                                allele.ref=rep(dummy_ref_allele, nrow(v)),
-                                                allele.alt=rep(dummy_alt_allele, nrow(v)))
-  return(c)
-}
+#getAlleleCounts.Scalpel_indel = function(v, sample_col, dummy_alt_allele="A", dummy_ref_allele="C") {
+#  counts = do.call(rbind, geno(v)$AD[,sample_col])
+#  c = dpclust3p:::construct_allelecounter_table(count.ref=counts[,1],
+#                                                count.alt=counts[,2],
+#                                                allele.ref=rep(dummy_ref_allele, nrow(v)),
+#                                                allele.alt=rep(dummy_alt_allele, nrow(v)))
+#  return(c)
+#}
 
 #' Dump allele counts in Mutect format
 #' 
@@ -648,16 +651,16 @@ getAlleleCounts.Scalpel_indel = function(v, sample_col, dummy_alt_allele="A", du
 #' @return An array with 4 columns: Counts for A, C, G, T
 #' @author sd11
 #' @noRd
-getAlleleCounts.mutect = function(v, sample_col) {
-  counts = do.call(rbind, geno(v)$AD[,sample_col])
-  count.ref = counts[,1]
-  count.alt = counts[,2]
-  allele.ref = as.character(VariantAnnotation::ref(v))
-  # allele.alt = unlist(lapply(VariantAnnotation::alt(v), function(x) { as.character(x[[1]]) }))
-  allele.alt = getAltAllele(v)
-  output = construct_allelecounter_table(count.ref, count.alt, allele.ref, allele.alt)
-  return(output)
-}
+#getAlleleCounts.mutect = function(v, sample_col) {
+#  counts = do.call(rbind, geno(v)$AD[,sample_col])
+#  count.ref = counts[,1]
+#  count.alt = counts[,2]
+#  allele.ref = as.character(VariantAnnotation::ref(v))
+#  # allele.alt = unlist(lapply(VariantAnnotation::alt(v), function(x) { as.character(x[[1]]) }))
+#  allele.alt = getAltAllele(v)
+#  output = construct_allelecounter_table(count.ref, count.alt, allele.ref, allele.alt)
+#  return(output)
+#}
 
 #' Function that constructs a table in the format of the allele counter
 #' @param count.ref Number of reads supporting the reference allele
@@ -667,19 +670,19 @@ getAlleleCounts.mutect = function(v, sample_col) {
 #' @return A data.frame consisting of four columns: Reads reporting A, C, G and T
 #' @author sd11
 #' @noRd
-construct_allelecounter_table = function(count.ref, count.alt, allele.ref, allele.alt) {
-  output = array(0, c(length(allele.ref), 4))
-  nucleotides = c("A", "C", "G", "T")
-  # Propagate the alt allele counts
-  nucleo.index = match(allele.alt, nucleotides)
-  for (i in 1:nrow(output)) {
-    output[i,nucleo.index[i]] = count.alt[i]
-  }
+#construct_allelecounter_table = function(count.ref, count.alt, allele.ref, allele.alt) {
+#  output = array(0, c(length(allele.ref), 4))
+#  nucleotides = c("A", "C", "G", "T")
+#  # Propagate the alt allele counts
+#  nucleo.index = match(allele.alt, nucleotides)
+#  for (i in 1:nrow(output)) {
+#    output[i,nucleo.index[i]] = count.alt[i]
+ # }
   
   # Propagate the reference allele counts
-  nucleo.index = match(allele.ref, nucleotides)
-  for (i in 1:nrow(output)) {
-    output[i,nucleo.index[i]] = count.ref[i]
-  }
-  return(output)
-}
+#  nucleo.index = match(allele.ref, nucleotides)
+#  for (i in 1:nrow(output)) {
+#    output[i,nucleo.index[i]] = count.ref[i]
+#  }
+ # return(output)
+#}
