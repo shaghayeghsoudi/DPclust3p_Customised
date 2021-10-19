@@ -358,6 +358,7 @@ GetDirichletProcessInfo<-function(outputfile, cellularity, info, subclone.file, 
   }
   
   subclone.data = read.table(subclone.file,sep="\t",header=T,stringsAsFactors=F)
+  print(head(subclone.data))
   subclone.data$chr<- gsub("chr","",subclone.data$chr)
   
   # Add in the Y chrom if donor is male and Battenberg hasn't supplied it (BB returns X/Y ad multiple copies of X for men)
