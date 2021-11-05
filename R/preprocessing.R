@@ -28,7 +28,7 @@ maf2loci = function(maf_file, outfile, dummy_alt_allele=NA, dummy_ref_allele=NA)
     dummy_ref_allele = "A"
     dummy_alt_allele = "C"
     
-    read_data_maf<-read.delim(file = maf_file, skip = 1, sep = "\t")
+    read_data_maf<-read.delim(file = maf_file, sep = "\t")
     read_data_maf_snv<-read_data_maf[read_data_maf$Variant_Type == "SNP",]
     
     # check that there was data in the file
