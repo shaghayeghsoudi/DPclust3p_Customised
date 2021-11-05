@@ -25,7 +25,7 @@
 dumpCounts.maf = function(maf_file, tumour_outfile,  normal_outfile=NA, samplename=NA, dummy_alt_allele=NA, dummy_ref_allele=NA) {
    
    for (maf_file in maf_file) { 
-   maf = read.delim(maf_file, skip = 1, header = TRUE, sep = "\t")
+   maf = read.delim(maf_file, header = TRUE, sep = "\t")
    dummy_ref_allele = "A"
    dummy_alt_allele = "C"
 
