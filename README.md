@@ -1,7 +1,7 @@
 
 # DPClust pre-processing
 
-Please note that this package has been modified and customized by Shaghayegh Soudi
+Please note that this package has been modified and customized by Shaghayegh Soudi to include MAF files as inputs and adjust correct indel allele frequency
 
 This R package contains various functions to produce input data for [DPClust](https://github.com/Wedge-Oxford/dpclust) using SNV variant calls and copy number data from [Battenberg](https://github.com/Wedge-Oxford/battenberg). Most importantly, it contains the `runGetDirichletProcessInfo` function that produces the input data for SNV based clustering.
 
