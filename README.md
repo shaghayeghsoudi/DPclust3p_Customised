@@ -6,8 +6,8 @@ The modified package also works for any genome assembely and not just hg19 in th
 
 This R package contains various functions to produce input data for [DPClust](https://github.com/Wedge-Oxford/dpclust) using SNV variant calls and copy number data from [Battenberg](https://github.com/Wedge-Oxford/battenberg). Most importantly, it contains the `runGetDirichletProcessInfo` function that produces the input data for SNV based clustering.
 
-
-Modified by Shaghayegh Soudi September 2021 
+Modified by Shaghayegh Soudi, September 2021
+ 
 -------------------------------------------------------------------------------------------------------------------
 ## Installation instructions
 dpclust3p is an R package and can be installed with the commands right below. It also requires the [alleleCounter](https://github.com/cancerit/allelecount) tool to be in `$PATH`.
