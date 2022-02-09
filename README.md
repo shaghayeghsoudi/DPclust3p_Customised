@@ -2,12 +2,13 @@
 # DPClust pre-processing
 
 Please note that this package has been modified and customized by Shaghayegh Soudi. New functions have been defined to include MAF files as inputs and adjust correct indel allele frequency.
+The modified package also works for any genome assembely and not just hg19 in the original package.
 
 This R package contains various functions to produce input data for [DPClust](https://github.com/Wedge-Oxford/dpclust) using SNV variant calls and copy number data from [Battenberg](https://github.com/Wedge-Oxford/battenberg). Most importantly, it contains the `runGetDirichletProcessInfo` function that produces the input data for SNV based clustering.
 
-## IMPORTANT NOTE: R scripts have been updated to take maf files as an inputs which is not in the original package. The orginal package works for certain vcf file formats ##
-The customized preprocessing package takes both SNVs and indels from maf file and processes them together. The original script takes only specif versions of vcf files.
-For the original package see her
+R scripts have been updated to take maf files as an inputs which is not in the original package. The orginal package works for certain vcf file formats ##
+The customized preprocessing package takes both SNVs and indels from maf file and processes them together. The original script takes only specific vcf file formats.
+The original package accept only hg19 assembly but the modified package can take any genome built.
 
 Modified by Shaghayegh Soudi September 2021 
 -------------------------------------------------------------------------------------------------------------------
